@@ -1,31 +1,25 @@
 package com.example.kaixinyu.serialportdemo;
 
+import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Arrays;
 
 /**
  * Created by kxyu on 2019/8/7
  */
 public class MainActvity extends AppCompatActivity {
-    private OutputStream mOutputStream;
-    private InputStream mIn;
     private Button writeBtn, openBtn;
-    private TextView tvRate, tvPortPath;
-    private SerialReadThread readThread;
-    private SerialPort serialPort;
+    private TextView tvRate, tvPortPath, txtTv, deviceNameTv;
     private boolean isOpenPort = false;
+    private StringBuilder txtSb = new StringBuilder();
+    private String portPath;
 
     /** Called when the activity is first created. */
     @Override
@@ -33,12 +27,16 @@ public class MainActvity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        deviceNameTv =findViewById(R.id.deviceNameTv);
         writeBtn = findViewById(R.id.ButtonWrite);
         openBtn = findViewById(R.id.openBtn);
         tvRate = findViewById(R.id.rateTv);
         tvPortPath = findViewById(R.id.portPathTv);
+        txtTv = findViewById(R.id.showTxtTv);
         tvRate.setText("9600");
-        tvPortPath.setText("/dev/ttyS1");
+        portPath = DataConstants.serialMap.get(Build.DEVICE.toLowerCase());
+        tvPortPath.setText(portPath);
+        deviceNameTv.setText(Build.DEVICE);
         initEvent();
 
     }
@@ -54,48 +52,39 @@ public class MainActvity extends AppCompatActivity {
         public void onClick(View v) {
             switch (v.getId()){
                 case R.id.ButtonWrite:
-                    byte[] mBuffer = new byte[1024];
-                    Arrays.fill(mBuffer, (byte) 0x55);
-                    try {
-                        mOutputStream.write(mBuffer);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    byte[] mBuffer = new byte[1];
+                    Arrays.fill(mBuffer, (byte)'P');
+                    SerialPortUtil.getInstance().sendDataToSerialPort(mBuffer);
+                    txtSb.append(" 发送 P ");
+                    txtSb.append("      ");
+                    txtTv.setText(txtSb.toString());
+
                     break;
                 case R.id.openBtn:
                     if(isOpenPort){
-                        if(readThread != null){
-                            readThread.close();
-                        }
-                        try {
-                            mIn.close();
-                            mOutputStream.close();
-                            serialPort.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }finally {
-                            isOpenPort = false;
-                            openBtn.setText("连接");
-                        }
-
+                        SerialPortUtil.getInstance().closeSerialPort();
+                        isOpenPort = false;
+                        openBtn.setText("连接");
                     }else {
                         try {
-                            serialPort = new SerialPort(new File("/dev/ttyS1"), 9600, 0);//your serial port dev
-                            mOutputStream = serialPort.getOutputStream();
-                            mIn = serialPort.getInputStream();
-
-                            if (readThread == null){
-                                readThread = new SerialReadThread(mIn);
-                            }
-                            readThread.start();
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                            SerialPortUtil.getInstance().openSerialPort(portPath, 9600, new SerialReadThread.ReadThreadCallBack() {
+                                @Override
+                                public void callBack(final String txt) {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            txtSb.append("接收 ："+txt);
+                                            txtSb.append("      ");
+                                            txtTv.setText(txtSb.toString());
+                                        }
+                                    });
+                                }
+                            });
                         }finally {
                             isOpenPort = true;
                             openBtn.setText("断开");
                         }
                     }
-
                     break;
             }
         }

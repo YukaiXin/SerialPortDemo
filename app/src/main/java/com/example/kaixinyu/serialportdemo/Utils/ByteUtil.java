@@ -1,4 +1,4 @@
-package com.example.kaixinyu.serialportdemo;
+package com.example.kaixinyu.serialportdemo.Utils;
 
 /**
  * Author by Winds on 2016/10/18.

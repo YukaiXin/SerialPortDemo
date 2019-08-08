@@ -4,17 +4,25 @@ import android.os.SystemClock;
 import android.util.Log;
 
 
+import com.example.kaixinyu.serialportdemo.Utils.ByteUtil;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
+ * Created by kxyu on 2019/8/7
  * 读串口线程
  */
 public class SerialReadThread extends Thread {
 
-    private static final String TAG = "SerialReadThread";
+    private static final String TAG = SerialReadThread.class.getSimpleName();
 
+    public interface ReadThreadCallBack{
+        void callBack(String txt);
+    }
+
+    private ReadThreadCallBack callBack;
     private BufferedInputStream mInputStream;
 
     public SerialReadThread(InputStream is) {
@@ -34,7 +42,6 @@ public class SerialReadThread extends Thread {
                 break;
             }
             try {
-
                 int available = mInputStream.available();
 
                 if (available > 0) {
@@ -43,7 +50,6 @@ public class SerialReadThread extends Thread {
                         onDataReceive(received, size);
                     }
                 } else {
-                    // 暂停一点时间，免得一直循环造成CPU占用率过高
                     SystemClock.sleep(1000);
                 }
             } catch (IOException e) {
@@ -63,6 +69,9 @@ public class SerialReadThread extends Thread {
         // TODO: 2018/3/22 解决粘包、分包等
         String hexStr = ByteUtil.bytes2HexStr(received, 0, size);
         Log.i(TAG,hexStr+"");
+        if(callBack != null){
+            callBack.callBack(hexStr);
+        }
     }
 
     /**
@@ -77,5 +86,9 @@ public class SerialReadThread extends Thread {
         } finally {
             super.interrupt();
         }
+    }
+
+    public void setCallBack(ReadThreadCallBack callBack) {
+        this.callBack = callBack;
     }
 }

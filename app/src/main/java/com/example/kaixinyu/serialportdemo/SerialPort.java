@@ -26,12 +26,15 @@ import java.io.OutputStream;
 
 import android.util.Log;
 
+/**
+ * Created by kxyu on 2019/8/7
+ */
 public class SerialPort {
 
-	private static final String TAG = "SerialPort";
+	private static final String TAG = SerialPort.class.getSimpleName();
 
-	/*
-	 * Do not remove or rename the field mFd: it is used by native method close();
+	/**
+	 * 不要修改mfd, native方法使用
 	 */
 	private FileDescriptor mFd;
 	private FileInputStream mFileInputStream;
@@ -48,7 +51,7 @@ public class SerialPort {
 		mFileOutputStream = new FileOutputStream(mFd);
 	}
 
-	// Getters and setters
+
 	public InputStream getInputStream() {
 		return mFileInputStream;
 	}
@@ -57,9 +60,12 @@ public class SerialPort {
 		return mFileOutputStream;
 	}
 
+
+
 	// JNI
 	private native static FileDescriptor open(String path, int baudrate, int flags);
 	public native void close();
+
 	static {
 		System.loadLibrary("serial_port");
 	}
