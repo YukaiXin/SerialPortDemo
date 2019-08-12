@@ -1,6 +1,9 @@
-package com.example.kaixinyu.serialportdemo;
+package com.example.kaixinyu.serialportdemo.Utils;
 
 import android.util.Log;
+
+import com.example.kaixinyu.serialportdemo.SerialPort;
+import com.example.kaixinyu.serialportdemo.SerialReadThread;
 
 import java.io.File;
 import java.io.IOException;

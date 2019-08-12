@@ -12,12 +12,14 @@ import java.io.InputStream;
 
 /**
  * Created by kxyu on 2019/8/7
- * 读串口线程
+ * 读取串口数据线程
  */
 public class SerialReadThread extends Thread {
 
     private static final String TAG = SerialReadThread.class.getSimpleName();
 
+    private final int DATA_SIZE = 1024;
+    private final int TIME = 1000;
     public interface ReadThreadCallBack{
         void callBack(String txt);
     }
@@ -31,7 +33,7 @@ public class SerialReadThread extends Thread {
 
     @Override
     public void run() {
-        byte[] received = new byte[1024];
+        byte[] received = new byte[DATA_SIZE];
         int size;
 
         Log.i(TAG," 开始读线程 ");
@@ -50,7 +52,7 @@ public class SerialReadThread extends Thread {
                         onDataReceive(received, size);
                     }
                 } else {
-                    SystemClock.sleep(1000);
+                    SystemClock.sleep(TIME);
                 }
             } catch (IOException e) {
                 Log.i(TAG,"读取数据失败 "+e.getMessage());
@@ -66,7 +68,6 @@ public class SerialReadThread extends Thread {
      * @param size
      */
     private void onDataReceive(byte[] received, int size) {
-        // TODO: 2018/3/22 解决粘包、分包等
         String hexStr = ByteUtil.bytes2HexStr(received, 0, size);
         Log.i(TAG,hexStr+"");
         if(callBack != null){
@@ -78,7 +79,6 @@ public class SerialReadThread extends Thread {
      * 停止读线程
      */
     public void close() {
-
         try {
             mInputStream.close();
         } catch (IOException e) {

@@ -7,8 +7,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.io.File;
-import java.io.IOException;
+import com.example.kaixinyu.serialportdemo.Utils.SerialPortUtil;
+
 import java.util.Arrays;
 
 /**
