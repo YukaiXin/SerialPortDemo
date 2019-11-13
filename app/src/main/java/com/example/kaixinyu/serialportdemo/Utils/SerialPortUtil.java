@@ -1,6 +1,8 @@
 package com.example.kaixinyu.serialportdemo.Utils;
 
+import android.app.Application;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.kaixinyu.serialportdemo.SerialPort;
 import com.example.kaixinyu.serialportdemo.SerialReadThread;
@@ -40,8 +42,8 @@ public class SerialPortUtil {
      * @param baudRate
      * @param callBack
      */
-    public void openSerialPort(String portPath, int baudRate, SerialReadThread.ReadThreadCallBack callBack){
-
+    public boolean openSerialPort(String portPath, int baudRate, SerialReadThread.ReadThreadCallBack callBack){
+        boolean isOpen = false;
         try {
             Log.i("kxyu_port","  "+portPath+"  baudRate  : "+baudRate);
             serialPort = new SerialPort(new File(portPath), baudRate,0);
@@ -55,9 +57,14 @@ public class SerialPortUtil {
             readThread = new SerialReadThread(inputStream);
             readThread.setCallBack(callBack);
             readThread.start();
+            Log.i("kxyu_port"," 串口打开成功 ");
+            isOpen = true;
         }catch (IOException e){
             Log.i(TAG, "串口连接失败");
             e.printStackTrace();
+            isOpen = false;
+        }finally {
+            return isOpen;
         }
     }
 
@@ -66,9 +73,16 @@ public class SerialPortUtil {
      */
     public void closeSerialPort(){
         try{
-            inputStream.close();
-            outputStream.close();
-            serialPort.close();
+            if(inputStream != null){
+                inputStream.close();
+            }
+            if(outputStream != null){
+                outputStream.close();
+            }
+            if(serialPort != null){
+                serialPort.close();
+                serialPort = null;
+            }
             if(readThread != null){
                 readThread.close();
                 readThread = null;

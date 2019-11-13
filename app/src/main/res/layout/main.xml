@@ -12,6 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="1dp"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:text="d2"
         />
@@ -22,18 +23,35 @@
         style="@style/button_style"
         android:layout_width="100dp"
         android:layout_height="40dp"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/deviceNameTv"
         />
 
-    <TextView
-        android:id="@+id/portPathTv"
-        android:text="port path"
+    <LinearLayout
+        android:id="@+id/portPathFl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/colorPrimary"
+        android:orientation="vertical"
         app:layout_constraintLeft_toRightOf="@id/openBtn"
         app:layout_constraintRight_toLeftOf="@id/rateTv"
-        app:layout_constraintBaseline_toBaselineOf="@id/openBtn"/>
+        app:layout_constraintBaseline_toBaselineOf="@id/openBtn">
+        <TextView
+            android:id="@+id/portPathTv"
+            android:text="port path"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorPrimary"/>
+        <Spinner
+            android:id="@+id/spinnerPort"
+            android:layout_width="250dp"
+            android:layout_height="20dp"
+            android:layout_margin="1dp"
+            android:layout_weight="1"
+            android:background="@color/colorPrimaryDark"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/rateTv"
@@ -43,7 +61,7 @@
         android:textColor="@color/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginRight="30dp"
-        app:layout_constraintLeft_toRightOf="@id/portPathTv"
+        app:layout_constraintLeft_toRightOf="@id/portPathFl"
         app:layout_constraintBaseline_toBaselineOf="@id/openBtn"/>
 
     <Button

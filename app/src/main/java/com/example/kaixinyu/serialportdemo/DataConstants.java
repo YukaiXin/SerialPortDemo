@@ -14,6 +14,7 @@ public class DataConstants {
          * 商米机器
          * https://docs.sunmi.com/general-function-modules/external-usb-serial-devices/
          */
+        serialMap.put("t1host", "/dev/ttyHSL1");
         serialMap.put("s2", "/dev/ttyHSL3");
         serialMap.put("t2","/dev/ttyHSL3");
         serialMap.put("x2","/dev/ttyHSL3");
