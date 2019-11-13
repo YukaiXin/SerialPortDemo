@@ -15,7 +15,9 @@ import android.widget.Toast;
 
 import com.example.kaixinyu.serialportdemo.Utils.SerialPortUtil;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by kxyu on 2019/8/7
@@ -27,8 +29,9 @@ public class MainActvity extends AppCompatActivity  implements AdapterView.OnIte
     private StringBuilder txtSb = new StringBuilder();
     private String portPath;
     private Spinner spinnerPort;
-    private String[] mDevices;
+    private List<String> mDevices;
     private int mDeviceIndex;
+    private final String SERIAL_PORT_PATH = "tty";
 
     /** Called when the activity is first created. */
     @Override
@@ -48,41 +51,36 @@ public class MainActvity extends AppCompatActivity  implements AdapterView.OnIte
 
         deviceNameTv.setText(Build.DEVICE);
         initEvent();
-        initDevice();
+        initSpinners();
     }
 
     /**
      * 初始化设备列表
      */
-    private void initDevice() {
+    private void initSpinners() {
 
         SerialPortFinder serialPortFinder = new SerialPortFinder();
         // 设备
-        mDevices = serialPortFinder.getAllDevicesPath();
-        if (mDevices.length == 0) {
-            mDevices = new String[] {
-                    "没有设备"
-            };
-        }
+        mDevices = new ArrayList<>();
 
-        for (String dev:mDevices){
+        for (String dev: serialPortFinder.getAllDevicesPath()){
+            if(dev.contains(SERIAL_PORT_PATH)){
+                mDevices.add(dev);
+            }
             Log.i("getAllDevicesPath()",dev);
         }
-        initSpinners();
-    }
+        if(mDevices.size() == 0){
+            mDevices.add("没有设备");
+        }
 
-    /**
-     * 初始化下拉选项
-     */
-    private void initSpinners() {
-        ArrayAdapter<String> deviceAdapter =
-                new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item, mDevices);
+
+        ArrayAdapter<String> deviceAdapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item, mDevices);
         deviceAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         spinnerPort.setAdapter(deviceAdapter);
         spinnerPort.setOnItemSelectedListener(this);
-
         spinnerPort.setSelection(mDeviceIndex);
     }
+
 
     private void initEvent(){
         writeBtn.setOnClickListener(onClickListener);
@@ -143,7 +141,7 @@ public class MainActvity extends AppCompatActivity  implements AdapterView.OnIte
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-         portPath = mDevices[position];
+         portPath = mDevices.get(position);
          tvPortPath.setText(portPath);
     }
 

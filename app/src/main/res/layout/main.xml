@@ -45,10 +45,10 @@
             android:id="@+id/spinnerPort"
             android:layout_width="250dp"
             android:layout_height="20dp"
-            android:layout_margin="1dp"
+            android:layout_margin="4dp"
             android:layout_weight="1"
-            android:background="@color/colorPrimaryDark"
-            android:textSize="14sp" />
+            android:background="#ffa0a7cc"
+            android:textSize="36sp" />
 
     </LinearLayout>
 
