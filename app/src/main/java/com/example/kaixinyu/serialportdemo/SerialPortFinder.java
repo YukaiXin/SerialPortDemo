@@ -66,7 +66,6 @@ public class SerialPortFinder {
 
     public String[] getAllDevicesPath() {
         Vector devices = new Vector();
-
         try {
             Iterator itdriv = this.getDrivers().iterator();
 

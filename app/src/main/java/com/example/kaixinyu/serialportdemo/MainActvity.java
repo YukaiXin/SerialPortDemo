@@ -3,6 +3,8 @@ package com.example.kaixinyu.serialportdemo;
 import android.bluetooth.BluetoothClass;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -23,14 +25,28 @@ import java.util.List;
  * Created by kxyu on 2019/8/7
  */
 public class MainActvity extends AppCompatActivity  implements AdapterView.OnItemSelectedListener{
+    private final String TAG = MainActvity.class.getSimpleName();
     private Button writeBtn, openBtn;
     private TextView tvRate, tvPortPath, txtTv, deviceNameTv;
+    private boolean isStart  = false;
     private boolean isOpenPort = false;
     private StringBuilder txtSb = new StringBuilder();
     private String portPath;
     private Spinner spinnerPort;
     private List<String> mDevices;
     private int mDeviceIndex;
+    private Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            byte[] mBuffer = new byte[1];
+            Arrays.fill(mBuffer, (byte)'P');
+            SerialPortUtil.getInstance().sendDataToSerialPort(mBuffer);
+            txtSb.append(" 发送 P ");
+            txtSb.append("      ");
+            txtTv.setText(txtSb.toString());
+            return false;
+        }
+    });
     private final String SERIAL_PORT_PATH = "tty";
 
     /** Called when the activity is first created. */
@@ -49,7 +65,7 @@ public class MainActvity extends AppCompatActivity  implements AdapterView.OnIte
         portPath = DataConstants.serialMap.get(Build.DEVICE.toLowerCase());
         tvPortPath.setText(portPath);
 
-        deviceNameTv.setText(Build.DEVICE);
+        deviceNameTv.setText(Build.MODEL);
         initEvent();
         initSpinners();
     }
@@ -67,8 +83,13 @@ public class MainActvity extends AppCompatActivity  implements AdapterView.OnIte
             if(dev.contains(SERIAL_PORT_PATH)){
                 mDevices.add(dev);
             }
-            Log.i("getAllDevicesPath()",dev);
+            Log.i(TAG,dev);
         }
+
+        for (String a: serialPortFinder.getAllDevices()){
+            Log.i("kxyu_t","   "+a);
+        }
+
         if(mDevices.size() == 0){
             mDevices.add("没有设备");
         }
@@ -93,12 +114,14 @@ public class MainActvity extends AppCompatActivity  implements AdapterView.OnIte
         public void onClick(View v) {
             switch (v.getId()){
                 case R.id.ButtonWrite:
-                    byte[] mBuffer = new byte[1];
-                    Arrays.fill(mBuffer, (byte)'P');
-                    SerialPortUtil.getInstance().sendDataToSerialPort(mBuffer);
-                    txtSb.append(" 发送 P ");
-                    txtSb.append("      ");
-                    txtTv.setText(txtSb.toString());
+                    if(isStart){
+                        writeBtn.setText("发送 80");
+                        isStart = false;
+                    }else {
+                        isStart = true;
+                        writeBtn.setText("停止");
+                        handler.sendEmptyMessage(0);
+                    }
 
                     break;
                 case R.id.openBtn:
@@ -118,6 +141,9 @@ public class MainActvity extends AppCompatActivity  implements AdapterView.OnIte
                                             txtSb.append("接收 ："+txt);
                                             txtSb.append("      ");
                                             txtTv.setText(txtSb.toString());
+                                            if(isStart) {
+                                                handler.sendEmptyMessageDelayed(0, 1000);
+                                            }
                                         }
                                     });
                                 }

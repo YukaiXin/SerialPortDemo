@@ -98,6 +98,12 @@ public class SerialPortUtil {
      */
     public void sendDataToSerialPort(byte[] data){
 
+
+        Log.i("kxyu_p","  向串口发送数据  ");
+        if(readThread != null&& !readThread.isAlive()){
+            Log.i("kxyu_p","  readThread11111111  ");
+            readThread.start();
+        }
         try{
             int dataLength = data.length;
             if(dataLength > 0 && outputStream != null){
